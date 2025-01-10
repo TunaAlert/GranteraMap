@@ -48,6 +48,7 @@ var wikiDataLoaded = false
 
 var mapImage
 var locationIcon
+var iconsToLoad
 
 function init(){
     canvas = document.querySelector("#canvas")
@@ -74,7 +75,6 @@ function init(){
     sidebarResize.addEventListener("mousedown", startResize)
     document.addEventListener("mousemove", handleResize)
 
-    mapImage = loadImage("Grantera Map.webp")
     locationIcon = {
         unknown: loadImage("unknown icon.png"),
         capital: loadImage("capital icon.png"),
@@ -83,12 +83,17 @@ function init(){
         village: loadImage("village icon.png"),
         deseaderra: loadImage("deseaderra icon.png")
     }
+    mapImage = loadImage("Grantera Map.webp")
+    var icons = Object.values(locationIcon)
+    iconsToLoad = icons.length
+    icons.forEach(icon => {
+        icon.addEventListener("load", ()=>iconLoaded())
+    })
 
     mapImage.onload = ()=>{
         map.style.backgroundImage = "url(\"Grantera\\ Map.webp\")"
     }
     
-    render()
     view.apply()
 
     loop()
@@ -116,6 +121,8 @@ function wheelEvent(event){
     event.preventDefault()
 
     var delta = -event.deltaY*0.02
+    if(delta > 0.5) delta = 0.5
+    if(delta < -0.5) delta = -0.5
     changeZoom(delta)
 }
 
@@ -179,6 +186,12 @@ function handleResize(event){
         resize.resizing = false
         resize.size = limitSidebarResize(resize.size)
     }
+}
+
+function iconLoaded(icon){
+    iconsToLoad--
+    if(iconsToLoad <= 0)
+        render()
 }
 
 function wikiMessageReceived(event){

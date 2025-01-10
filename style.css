@@ -67,7 +67,8 @@ body{
     width: 0;
     height: 0;
     font-size: 8em;
-    animation: fade-regions 2s linear calc(-1s * clamp(0, var(--zoom) + 2, 1.99)) paused;
+    --fade: calc(-1s * clamp(0, var(--zoom) + 2, 1.99));
+    animation: fade-regions 2s linear var(--fade) paused;
 }
 
 .region.auria{
