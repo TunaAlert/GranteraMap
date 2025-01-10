@@ -44,6 +44,7 @@ var keys = {
     arrowup: false,
     arrowdown: false
 }
+var wikiDataLoaded = false
 
 var mapImage
 var locationIcon
@@ -55,6 +56,8 @@ function init(){
     sidebar = document.querySelector(".sidebar")
     sidebarResize = document.querySelector(".sidebar-resize")
     sidebarContent = document.querySelector(".sidebar-content")
+    wikiPage = document.querySelector(`.sidebar-content iframe`)
+    fallbackPage = document.querySelector(`.sidebar-content .not-found`)
     topTextSpan = document.querySelector(".top-text span")
     datahint = document.querySelector("#datahint")
     contextMenu = document.querySelector(".context-menu")
@@ -66,32 +69,10 @@ function init(){
     canvas.addEventListener("contextmenu", contextMenuEvent)
     document.addEventListener("keyup", keyUpEvent)
     document.addEventListener("keydown", keyDownEvent)
+    window.addEventListener("message", wikiMessageReceived)
 
     sidebarResize.addEventListener("mousedown", startResize)
     document.addEventListener("mousemove", handleResize)
-
-    document.querySelectorAll(".wiki-page h2").forEach((h2) => {
-        h2.addEventListener("click", (event)=>{
-            var open = h2.className.includes("open")
-            if(open){
-                h2.className = h2.className.replaceAll("open", "").replaceAll(/\s+/g, "")
-                h2.nextElementSibling.className = h2.nextElementSibling.className.replaceAll("open", "").replaceAll(/\s+/g, "")
-            }else{
-                h2.className += " open"
-                h2.nextElementSibling.className += " open"
-            }
-        })
-    })
-
-    document.querySelectorAll(".wiki-page .reference").forEach((reference) => {
-        var ref = reference.getAttribute("ref")
-        if(!ref || !document.querySelector(`.wiki-page.${ref}`)){
-            reference.className += " unknown"
-        }
-        reference.addEventListener("click", (event)=>{
-            openWikiPage(ref, reference.innerText)
-        })
-    })
 
     mapImage = loadImage("Grantera Map.webp")
     locationIcon = {
@@ -197,6 +178,15 @@ function handleResize(event){
     }else{
         resize.resizing = false
         resize.size = limitSidebarResize(resize.size)
+    }
+}
+
+function wikiMessageReceived(event){
+    if(event.data == 'loaded'){
+        wikiDataLoaded = true
+    }else if(event.data.loading){
+        wikiDataLoaded = false
+        openWikiPage(event.data.page, event.data.fallback)
     }
 }
 
@@ -411,17 +401,22 @@ function tintIcon(icon, tint){
 }
 
 function openWikiPage(page, fallbackTitle){
-    sidebarContent.childNodes.forEach((element)=>{
-        if(element?.style)
-            element.style.display = "none"
-    })
-    var wikipage = document.querySelector(`.wiki-page.${page}`)
-    if(page && wikipage){
-        wikipage.style.display = "block"
+    if(page){
+        wikiPage.style.display = "block"
+        wikiPage.src = `wiki/${page}.html`
+        fallbackPage.style.display = "none"
+        wikiDataLoaded = false
+        wikiPage.onload = (event)=>{
+            if(!wikiDataLoaded){
+                wikiPage.style.display = "none"
+                fallbackPage.style.display = "block"
+                fallbackPage.firstElementChild.innerText = fallbackTitle
+            }
+        }
     }else{
-        wikipage = document.querySelector(`.wiki-page.not-found`)
-        wikipage.style.display = "block"
-        wikipage.firstElementChild.innerText = fallbackTitle
+        wikiPage.style.display = "none"
+        fallbackPage.style.display = "block"
+        fallbackPage.firstElementChild.innerText = fallbackTitle
     }
     sidebar.className = sidebar.className + " open"
 }

@@ -1,0 +1,51 @@
+
+body{
+    font: 1em Arial, Helvetica, sans-serif;
+}
+
+h2{
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    padding-right: auto;
+    cursor: pointer;
+}
+
+h2::before{
+    content: " ";
+    background-image: url("arrowright.png");
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: 50%;
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    margin-right: 0.3em;
+}
+
+h2.open::before{
+    background-image: url("arrowdown.png");
+}
+
+div{
+    display: none;
+    padding-left: 1em;
+}
+
+div.open{
+    display: block;
+}
+
+.reference{
+    text-decoration: dotted underline;
+    color: blue;
+    cursor: pointer;
+}
+
+.reference.unknown{
+    color: red;
+}
+
+.reference:hover{
+    text-decoration: underline;
+}

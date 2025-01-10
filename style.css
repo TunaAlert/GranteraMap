@@ -297,55 +297,10 @@ body{
     overflow: auto;
 }
 
-.wiki-page{
-    display: none;
-}
-
-.wiki-page h2{
-    border-top: 1px solid rgba(0, 0, 0, 0.2);
-    padding-right: auto;
-    cursor: pointer;
-}
-
-.wiki-page h2::before{
-    content: " ";
-    background-image: url("arrowright.png");
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    background-size: 50%;
-    display: inline-block;
-    width: 0.7em;
-    height: 0.7em;
-    border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    margin-right: 0.3em;
-}
-
-.wiki-page h2.open::before{
-    background-image: url("arrowdown.png");
-}
-
-.wiki-page div{
-    display: none;
-    padding-left: 1em;
-}
-
-.wiki-page div.open{
-    display: block;
-}
-
-.wiki-page .reference{
-    text-decoration: dotted underline;
-    color: blue;
-    cursor: pointer;
-}
-
-.wiki-page .reference.unknown{
-    color: red;
-}
-
-.wiki-page .reference:hover{
-    text-decoration: underline;
+.sidebar-content iframe{
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 
 .context-menu{
