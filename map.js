@@ -104,10 +104,11 @@ function init(){
     }
 
     mapImage.onload = ()=>{
-        render()
-        view.apply()
         map.style.backgroundImage = "url(\"Grantera\\ Map.webp\")"
     }
+    
+    render()
+    view.apply()
 
     loop()
 }
@@ -318,10 +319,6 @@ function loop(){
 }
 
 function render(){
-
-    mapScaler.style.width = `${mapImage.width}px`
-    mapScaler.style.height = `${mapImage.height}px`
-
     mapdata.regions.forEach(region => renderRegion(region))
     mapdata.locations?.forEach(location => renderLocation(location, null))
 }
