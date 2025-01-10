@@ -1,0 +1,380 @@
+@font-face { font-family: Quintessential; src: url('Quintessential-Regular.ttf'); } 
+
+@property --zoom {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+}
+
+@property --color {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: "";
+}
+
+@property --fade {
+    syntax: "<time>";
+    inherits: true;
+    initial-value: 0;
+}
+
+body{
+    margin: 0;
+    overflow: hidden;
+}
+
+#canvas{
+    width: 100vw;
+    height: 100vh;
+}
+
+#map-centerer{
+    width:100vw;
+    height: 100vh;
+    position: absolute;
+    left: 50vw;
+    top: 50vh;
+}
+
+#map-scaler{
+    --zoom: -4;
+    transform: scale(calc(pow(2, var(--zoom))));
+    transform-origin: 0% 0%;
+    width: 8192px;
+    height: 4096px;
+}
+
+#map{
+    width: 100%;
+    height: 100%;
+    background-image: url("Grantera\ Map\ LQ.jpg");
+    background-size: 100%;
+    position: absolute;
+    transition: inherit;
+}
+
+@keyframes fade-regions {
+    0% {opacity: 100%;}
+    25% {opacity: 100%;}
+    49%{pointer-events: unset;}
+    50% {pointer-events: none;}
+    75% {opacity: 0%;}
+    100% {opacity: 0%;}
+}
+
+.region{
+    position: absolute;
+    width: 0;
+    height: 0;
+    font-size: 8em;
+    animation: fade-regions 2s linear calc(-1s * clamp(0, var(--zoom) + 2, 1.99)) paused;
+}
+
+.region.auria{
+    font-size: 10em;
+}
+
+.region.southern-plains{
+    font-size: 6em;
+}
+
+.region.pantera-blanca{
+    font-size: 5em;
+}
+
+.region.holerio{
+    font-size: 6em;
+}
+
+.region.ontigoron{
+    font-size: 4em;
+}
+
+.region.siria{
+    font-size: 8em;
+}
+
+.region.iksol{
+    font-size: 12em;
+}
+
+.region .label-box{
+    width: fit-content;
+    transform: translate(-50%, -0.5em);
+}
+
+.region .label{
+    filter: drop-shadow(0 0 2px rgb(255, 198, 85)) drop-shadow(0 0 5px var(--color));
+    text-transform: capitalize;
+    color: black;
+    font-family: Quintessential;
+    text-anchor: middle;
+    user-select: none;
+    white-space: nowrap;
+}
+
+@keyframes stop-location-pointer-events {
+    0%, 24% {pointer-events: none;}
+    25%, 100% {pointer-events: unset;}
+}
+
+.location{
+    position: absolute;
+    width: 0;
+    height: 0;
+    transform: scale(calc(pow(0.5, var(--zoom))));
+    font-size: 2em;
+    --fade: -0.99s;
+    animation: stop-location-pointer-events 1s linear var(--fade, 0s) paused;
+}
+
+@keyframes fade-icons {
+    0% {opacity: 0%;}
+    50% {opacity: 75%;}
+    100% {opacity: 75%;}
+}
+
+@keyframes fade-labels {
+    0% {opacity: 0%;}
+    25% {opacity: 0%;}
+    75% {opacity: 85%;}
+    100% {opacity: 85%;}
+}
+
+.location.capital{
+    font-size: 3em;
+    --fade: calc(-1s * clamp(0, var(--zoom) + 1.5, 0.99));
+}
+
+.location.city{
+    font-size: 2.5em;
+    --fade: calc(-1s * clamp(0, var(--zoom) + 1, 0.99));
+}
+
+.location.deseaderra{
+    font-size: 2.5em;
+    --fade: calc(-1s * clamp(0, var(--zoom) + 1, 0.99));
+}
+
+.location.town{
+    font-size: 2em;
+    --fade: calc(-1s * clamp(0, var(--zoom), 0.99));
+}
+
+.location.village{
+    font-size: 2em;
+    --fade: calc(-1s * clamp(0, var(--zoom) - 1, 0.99));
+}
+
+.location .icon{
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 0 5px black);
+    animation: fade-icons 1s linear var(--fade, 0s) paused;
+}
+
+.location .label-box{
+    width: fit-content;
+    transform: translate(-50%, -1em);
+    animation: fade-labels 1s linear var(--fade, 0s) paused;
+}
+
+.location .label{
+    filter: drop-shadow(0 0 1px white) drop-shadow(0 0 3px var(--color));
+    color: black;
+    font-family: Quintessential;
+    text-anchor: middle;
+    transform: translateY(-1em);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.location.deseaderra .label{
+    filter: drop-shadow(0 0 1px white);
+}
+
+.location.location.deseaderra .label::after {
+    content: "Deseaderra";
+    position: absolute; 
+    inset: 0px;
+    background: linear-gradient(135deg, rgba(0,100,255,1) 45%, rgba(255,0,0,1) 55%);
+    color: transparent;
+    background-clip: text;
+    filter: blur(3px);
+    transform: translate3d(0px,0px,-1px);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.controls{
+    position: absolute;
+    left: 0em;
+    top: 0em;
+    display: flex;
+    flex-direction: column;
+    padding: 0.25em;
+    opacity: 30%;
+    transition: opacity 0.1s;
+}
+
+.controls:hover{
+    opacity: 90%;
+}
+
+.controls .zoom{
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0.25em auto;
+}
+
+.controls .direction{
+    width: 1.5rem;
+    height: 1.5rem;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    position: absolute;
+}
+
+.top-text{
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0;
+    padding: 0.5em;
+    font: 3em Quintessential;
+    text-shadow: 2px 2px 1px white, -2px 2px 1px white, 2px -2px 1px white, -2px -2px 1px white;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+}
+
+.top-text div{
+    width: fit-content;
+    transform: translateX(-50%);
+}
+
+#datahint{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font: 1em helvetica;
+    padding: 0.5em 1em;
+}
+
+.sidebar{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    right: -100%;
+    top: 0;
+    height: 100vh;
+    transition: right linear 0.25s;
+    box-shadow: -1px 0 4px black;
+    background: url("sidebar.png");
+    background-size: cover;
+    background-position: 0 0;
+}
+
+.sidebar-resize{
+    width: 0.5em;
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 0.25em black;
+    cursor: ew-resize;
+}
+
+.sidebar.open{
+    right: 0;
+}
+
+.sidebar-content{
+    --resize: 0px;
+    width: calc(max(min(40vw, 20em), 3cm) + var(--resize));
+    padding: 1em;
+    font: 1em Arial, Helvetica, sans-serif;
+    overflow: auto;
+}
+
+.wiki-page{
+    display: none;
+}
+
+.wiki-page h2{
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    padding-right: auto;
+    cursor: pointer;
+}
+
+.wiki-page h2::before{
+    content: " ";
+    background-image: url("arrowright.png");
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: 50%;
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    margin-right: 0.3em;
+}
+
+.wiki-page h2.open::before{
+    background-image: url("arrowdown.png");
+}
+
+.wiki-page div{
+    display: none;
+    padding-left: 1em;
+}
+
+.wiki-page div.open{
+    display: block;
+}
+
+.wiki-page .reference{
+    text-decoration: dotted underline;
+    color: blue;
+    cursor: pointer;
+}
+
+.wiki-page .reference.unknown{
+    color: red;
+}
+
+.wiki-page .reference:hover{
+    text-decoration: underline;
+}
+
+.context-menu{
+    font: 0.75em Arial, Helvetica, sans-serif;
+    position: absolute;
+    transform: scale(calc(pow(0.5, var(--zoom))));
+    transform-origin: 0 0;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 0.1em;
+    box-shadow: 0 0 2px black;
+    padding: 0.2em;
+    display: none;
+}
+
+.context-menu span{
+    display: block;
+    padding: 0 0.5em;
+    border-top: 1px solid grey;
+    width: 100%;
+    box-sizing: border-box;
+    user-select: none;
+    cursor: pointer;
+}
+
+.context-menu span:first-of-type{
+    border-top: none;
+}
+
+.context-menu span:hover{
+    background-color: rgba(0, 0, 50, 0.1);
+}
