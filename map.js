@@ -172,6 +172,7 @@ function startResize(event){
     if(event.buttons&1){
         resize.resizing = true
         resize.lastX = event.clientX
+        wikiPage.style.pointerEvents = "none"
     }
 }
 
@@ -185,6 +186,7 @@ function handleResize(event){
     }else{
         resize.resizing = false
         resize.size = limitSidebarResize(resize.size)
+        wikiPage.style.pointerEvents = "unset"
     }
 }
 
