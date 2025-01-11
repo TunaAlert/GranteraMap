@@ -250,7 +250,9 @@ body{
     width: 0;
     padding: 0.5em;
     font: 3em Quintessential;
-    text-shadow: 2px 2px 1px white, -2px 2px 1px white, 2px -2px 1px white, -2px -2px 1px white;
+    color: white;
+    text-shadow: 2px 2px 1px black, -2px 2px 1px black, 2px -2px 1px black, -2px -2px 1px black,
+                0px -3px 1px black, 0px 3px 1px black, -3px 0px 1px black, 3px 0px 1px black;
     white-space: nowrap;
     user-select: none;
     pointer-events: none;
