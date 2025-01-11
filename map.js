@@ -229,11 +229,13 @@ function changeZoom(deltaZoom, onMouse = true){
     }
 
     clampViewCoords()
-    mapScaler.style.transition = "--zoom linear 0.1s"
-    if(deltaZoom > 0)
+    if(deltaZoom > 0){
         map.style.transition = "transform cubic-bezier(0, 0.05, 0.95, 1) 0.1s"
-    else
+        mapScaler.style.transition = "--scale cubic-bezier(0.05, 0, 1, 0.95) 0.1s"
+    }else{
         map.style.transition = "transform cubic-bezier(0.05, 0, 1, 0.95) 0.1s"
+        mapScaler.style.transition = "--scale cubic-bezier(0, 0.05, 0.95, 1) 0.1s"
+    }
     view.apply()
 }
 

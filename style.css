@@ -6,6 +6,12 @@
     initial-value: 0;
 }
 
+@property --scale {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+}
+
 @property --color {
     syntax: "<color>";
     inherits: true;
@@ -38,7 +44,8 @@ body{
 
 #map-scaler{
     --zoom: -4;
-    transform: scale(calc(pow(2, var(--zoom))));
+    --scale: calc(pow(2, var(--zoom)));
+    transform: scale(var(--scale));
     transform-origin: 0% 0%;
     width: 8192px;
     height: 4096px;
@@ -123,7 +130,7 @@ body{
     position: absolute;
     width: 0;
     height: 0;
-    transform: scale(calc(pow(0.5, var(--zoom))));
+    transform: scale(calc(1/var(--scale)));
     font-size: 2em;
     --fade: -0.99s;
     animation: stop-location-pointer-events 1s linear var(--fade, 0s) paused;
