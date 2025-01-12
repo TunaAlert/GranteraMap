@@ -483,6 +483,8 @@ function renderMeasurement(){
 function addMeasurementLine(start, end) {
     var measureElement = document.createElement("div")
     var vector = {x: end.x - start.x, y: end.y - start.y}
+    if(vector.x > 4096) vector.x -= 8192
+    if(vector.x < -4096) vector.x += 8192
     vector.length = Math.sqrt(vector.x*vector.x + vector.y*vector.y)
     vector.nx = vector.x/vector.length
     vector.ny = vector.y/vector.length
