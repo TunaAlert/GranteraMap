@@ -1,3 +1,6 @@
+html{
+    scrollbar-color: rgba(0, 0, 0, 0.4) rgba(255, 255, 255, 0.4);
+}
 
 body{
     font: 1em Arial, Helvetica, sans-serif;
@@ -27,7 +30,7 @@ h2.open::before{
     background-image: url("arrowdown.png");
 }
 
-div{
+body>div{
     display: none;
     padding-left: 1em;
 }

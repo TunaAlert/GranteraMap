@@ -108,6 +108,7 @@ var mapdata = {
                     x: 3790,
                     y: 1535,
                     name: "Auria",
+                    page: "auria-city",
                     type: "capital"
                 },
                 {

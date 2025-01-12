@@ -8,6 +8,7 @@ var sidebarContent
 var topTextSpan
 var datahint
 var contextMenu
+var measurementsDiv
 
 var labelFont = "Quintessential"
 
@@ -46,6 +47,11 @@ var keys = {
 }
 var wikiDataLoaded = false
 
+var measurement = {
+    locations: [],
+    distances: []
+}
+
 var mapImage
 var locationIcon
 var iconsToLoad
@@ -62,6 +68,7 @@ function init(){
     topTextSpan = document.querySelector(".top-text span")
     datahint = document.querySelector("#datahint")
     contextMenu = document.querySelector(".context-menu")
+    measurementsDiv = document.querySelector("#measurements")
 
     canvas.addEventListener("mousedown", mouseDownEvent)
     canvas.addEventListener("mouseup", mouseUpEvent)
@@ -75,6 +82,11 @@ function init(){
     sidebarResize.addEventListener("mousedown", startResize)
     document.addEventListener("mousemove", handleResize)
 
+    contextMenu.addEventListener("mousedown", (event)=>event.stopPropagation())
+    contextMenu.querySelector("span:nth-child(1)").addEventListener("click", startNewMeasurement)
+    contextMenu.querySelector("span:nth-child(2)").addEventListener("click", addToMeasurement)
+    contextMenu.querySelector("span:nth-child(3)").addEventListener("click", clearMeasurement)
+
     locationIcon = {
         unknown: loadImage("unknown icon.png"),
         capital: loadImage("capital icon.png"),
@@ -83,16 +95,11 @@ function init(){
         village: loadImage("village icon.png"),
         deseaderra: loadImage("deseaderra icon.png")
     }
-    mapImage = loadImage("Grantera Map.webp")
     var icons = Object.values(locationIcon)
     iconsToLoad = icons.length
     icons.forEach(icon => {
         icon.addEventListener("load", ()=>iconLoaded())
     })
-
-    mapImage.onload = ()=>{
-        map.style.backgroundImage = "url(\"Grantera\\ Map.webp\")"
-    }
     
     view.apply()
 
@@ -154,10 +161,12 @@ function mouseMoveEvent(event){
 
 function contextMenuEvent(event){
     event.preventDefault()
-    contextMenu.style.left = (event.clientX-canvas.width/2)/view.scale+view.x + "px"
-    contextMenu.style.top = (event.clientY-canvas.height/2)/view.scale+view.y + "px"
+    contextMenu.menuX = (event.clientX-canvas.width/2)/view.scale+view.x
+    contextMenu.menuY = (event.clientY-canvas.height/2)/view.scale+view.y
+    contextMenu.style.left = contextMenu.menuX + "px"
+    contextMenu.style.top = contextMenu.menuY + "px"
 
-    //contextMenu.style.display = "block"
+    contextMenu.style.display = "block"
 }
 
 function keyDownEvent(event){
@@ -192,8 +201,13 @@ function handleResize(event){
 
 function iconLoaded(icon){
     iconsToLoad--
-    if(iconsToLoad <= 0)
+    if(iconsToLoad <= 0){
+        mapImage = loadImage("Grantera Map.webp")
+        mapImage.onload = ()=>{
+            map.style.backgroundImage = "url(\"Grantera\\ Map.webp\")"
+        }
         render()
+    }
 }
 
 function wikiMessageReceived(event){
@@ -203,6 +217,37 @@ function wikiMessageReceived(event){
         wikiDataLoaded = false
         openWikiPage(event.data.page, event.data.fallback)
     }
+}
+
+function startNewMeasurement(){
+    var menuLongLat = pixelCoordsToPolarCoords(contextMenu.menuX, contextMenu.menuY)
+    var location = {x: contextMenu.menuX, y: contextMenu.menuY, longitude: menuLongLat.longitude, latitude: menuLongLat.latitude}
+    measurement.locations = [location]
+    measurement.distances = []
+    contextMenu.style.display = "none"
+    renderMeasurement()
+}
+
+function addToMeasurement(){
+    if(measurement.locations?.length == 0){
+        startNewMeasurement()
+        return
+    }
+    var menuLongLat = pixelCoordsToPolarCoords(contextMenu.menuX, contextMenu.menuY)
+    var lastLocation = measurement.locations[measurement.locations.length-1]
+    var location = {x: contextMenu.menuX, y: contextMenu.menuY, longitude: menuLongLat.longitude, latitude: menuLongLat.latitude}
+    var distance = greatCircleDistance(lastLocation.longitude, lastLocation.latitude, location.longitude, location.latitude)
+    measurement.locations.push(location)
+    measurement.distances.push(distance)
+    contextMenu.style.display = "none"
+    renderMeasurement()
+}
+
+function clearMeasurement(){
+    measurement.locations = []
+    measurement.distances = []
+    contextMenu.style.display = "none"
+    renderMeasurement()
 }
 
 function limitSidebarResize(size){
@@ -275,7 +320,7 @@ function loop(){
     canvas.width = canvas.getBoundingClientRect().width
     canvas.height = canvas.getBoundingClientRect().height
 
-    datahint.innerText = `x: ${Math.round(mouse.mapX)} y: ${Math.round(mouse.mapY)}, ${Math.abs(mouseLongLat.y).toFixed(2)}°${mouseLongLat.y >= 0 ? 'N' : 'S'} ${Math.abs(mouseLongLat.x).toFixed(2)}°${mouseLongLat.x >= 0 ? 'E' : 'W'}, scale: ${view.scale.toPrecision(2)}`
+    datahint.innerText = `x: ${Math.round(mouse.mapX)} y: ${Math.round(mouse.mapY)}, ${Math.abs(mouseLongLat.latitude).toFixed(2)}°${mouseLongLat.y >= 0 ? 'N' : 'S'} ${Math.abs(mouseLongLat.longitude).toFixed(2)}°${mouseLongLat.x >= 0 ? 'E' : 'W'}, scale: ${view.scale.toPrecision(2)}`
 
     speed = 10
     dx = 0
@@ -396,6 +441,59 @@ function renderLocation(location, region){
     map.appendChild(locationElement)
 }
 
+function renderMeasurement(){
+    measurementsDiv.innerHTML = ""
+
+    measurement.locations.forEach((location) => {
+        var measureElement = document.createElement("div")
+        measureElement.className = "measurement-point"
+        measureElement.style.left = location.x + "px"
+        measureElement.style.top = location.y + "px"
+        measurementsDiv.appendChild(measureElement)
+    })
+
+    var totalDistance = 0
+    for (let i = 0; i < measurement.distances.length; i++) {
+        var distance = measurement.distances[i];
+        totalDistance += degreesToDistance(distance)
+        var start = measurement.locations[i];
+        var end = measurement.locations[i+1];
+        var distanceText = document.createElement("div")
+        distanceText.innerHTML = `<span>${totalDistance.toFixed(1)}km</span>`
+        distanceText.className = "measurement-text"
+        distanceText.style.left = end.x + "px"
+        distanceText.style.top = end.y + "px"
+        measurementsDiv.appendChild(distanceText)
+
+        var lastPoint = start
+
+        for(let d = 1; d < distance; d++){
+            var t = d / Math.ceil(distance)
+            var interpolated = interpolatePolarCoordinates(start.longitude, start.latitude, end.longitude, end.latitude, t)
+            var interpolatedPixel = polarCoordsToPixelCoords(interpolated.longitude, interpolated.latitude)
+            interpolated.x = interpolatedPixel.x
+            interpolated.y = interpolatedPixel.y
+            addMeasurementLine(lastPoint, interpolated)
+            lastPoint = interpolated
+        }
+        addMeasurementLine(lastPoint, end)
+    }
+}
+
+function addMeasurementLine(start, end) {
+    var measureElement = document.createElement("div")
+    var vector = {x: end.x - start.x, y: end.y - start.y}
+    vector.length = Math.sqrt(vector.x*vector.x + vector.y*vector.y)
+    vector.nx = vector.x/vector.length
+    vector.ny = vector.y/vector.length
+    measureElement.className = "measurement-line"
+    measureElement.style.left = start.x + "px"
+    measureElement.style.top = start.y + "px"
+    measureElement.style.width = vector.length + "px"
+    measureElement.style.setProperty("--angle", Math.acos(vector.nx) * Math.sign(vector.ny) + "rad")
+    measurementsDiv.appendChild(measureElement)
+}
+
 function tintIcon(icon, tint){
     if(!icon){
         icon = locationIcon["unknown"]
@@ -445,12 +543,12 @@ function pixelCoordsToPolarCoords(x, y){
     y *= 180/4096
     x = ((x+540)%360)-180
     y = 180-((y+540)%360)
-    return {x, y}
+    return {longitude: x, latitude: y}
 }
 
-function polarCoordsToPixelCoords(x, y){
-    x = ((x+540)%360)-180
-    y = 180-((y+540)%360)
+function polarCoordsToPixelCoords(longitude, latitude){
+    var x = ((longitude+540)%360)-180
+    var y = 180-((latitude+540)%360)
     x *= 4096/180
     y *= 4096/180
     x += 4096
@@ -468,4 +566,36 @@ function greatCircleDistance(longitude1, latitude1, longitude2, latitude2){
     var sigma = Math.acos(Math.sin(p1)*Math.sin(p2) + Math.cos(p1)*Math.cos(p2)*Math.cos(l1-l2))
 
     return sigma*180/Math.PI
+}
+
+function interpolatePolarCoordinates(longitude1, latitude1, longitude2, latitude2, t){
+    var l1 = longitude1/180*Math.PI
+    var p1 = latitude1/180*Math.PI
+    var l2 = longitude2/180*Math.PI
+    var p2 = latitude2/180*Math.PI
+
+    var vec1 = {x: Math.cos(l1)*Math.cos(p1), y: Math.sin(l1) * Math.cos(p1), z: Math.sin(p1)}
+    var vec2 = {x: Math.cos(l2)*Math.cos(p2), y: Math.sin(l2) * Math.cos(p2), z: Math.sin(p2)}
+    var interVec = {
+        x: vec1.x*(1-t) + vec2.x*t,
+        y: vec1.y*(1-t) + vec2.y*t,
+        z: vec1.z*(1-t) + vec2.z*t
+    }
+    var interVecLength = Math.sqrt(interVec.x*interVec.x + interVec.y*interVec.y + interVec.z*interVec.z)
+    interVec.x /= interVecLength
+    interVec.y /= interVecLength
+    interVec.z /= interVecLength
+
+    interVecXYLength = Math.sqrt(interVec.x*interVec.x + interVec.y*interVec.y)
+
+    var lT = Math.acos(interVec.x / interVecXYLength) * Math.sign(interVec.y)
+    var pT = Math.asin(interVec.z)
+
+    var longitude = lT/Math.PI*180
+    var latitude = pT/Math.PI*180
+    return {longitude, latitude}
+}
+
+function degreesToDistance(degrees){
+    return degrees / 180 * Math.PI * 6000
 }

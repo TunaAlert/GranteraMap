@@ -322,6 +322,7 @@ body{
     box-shadow: 0 0 2px black;
     padding: 0.2em;
     display: none;
+    z-index: 1270;
 }
 
 .context-menu span{
@@ -340,4 +341,33 @@ body{
 
 .context-menu span:hover{
     background-color: rgba(0, 0, 50, 0.1);
+}
+
+.measurement-point{
+    width: 1em;
+    height: 1em;
+    transform: translate(-50%, -50%) scale(calc(1/var(--scale)));
+    background-image: url("measurement.png");
+    background-size: cover;
+    z-index: 100;
+    position: absolute;
+}
+
+.measurement-line{
+    z-index: 99;
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    --angle: 15deg;
+    background-color: black;
+    transform: rotate(var(--angle)) translateY(-50%) scaleY(calc(1/var(--scale)));
+    transform-origin: 0 50%;
+}
+
+.measurement-text{
+    position: absolute;
+    transform: translate(-50%, -100%) scale(calc(1/var(--scale)));
+    font: 1em Arial, Helvetica, Sans-serif;
+    color: black;
+    z-index: 101;
 }

@@ -3,9 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Page</title>
+    <title>The empire Auria</title>
     <link rel="stylesheet" href="wiki.css">
     <script src="wiki.js"></script>
+    <style>
+        #conquest-timeline{
+            width: 100%;
+            min-width: 90em;
+            display: flex;
+            flex-direction: column;
+        }
+        .year-box{
+            display: flex;
+            flex-direction: row;
+            height: max-content;
+        }
+        .year{
+            border: 1px solid black;
+            width: 11.1%;
+            height: 100%;
+            text-align: center;
+            background-color: white;
+        }
+        .event-box{
+            display: flex;
+            flex-direction: row;
+            z-index: 1;
+        }
+        .event{
+            --start: 0;
+            --length: 0;
+            margin-left: calc(100% * (var(--start))/365/9);
+            margin-top: 0.1em;
+            width: calc(100% * (var(--length))/365/9);
+            border: 1px solid black;
+            background-color: rgba(255, 200, 200, 0.3);
+            box-sizing: border-box;
+            text-align: center;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
     <h1>The empire Auria</h1>
@@ -22,6 +60,65 @@
     </div>
     <h2>Foundation and conquest</h2>
     <div>
+        <div style="overflow-x: auto;">
+            <div id="conquest-timeline">
+                <div class="year-box">
+                    <div class="year">
+                        275 Sabi
+                    </div>
+                    <div class="year">
+                        276 Sabi
+                    </div>
+                    <div class="year">
+                        277 Sabi
+                    </div>
+                    <div class="year">
+                        278 Sabi
+                    </div>
+                    <div class="year">
+                        279 Sabi
+                    </div>
+                    <div class="year">
+                        280 Sabi
+                    </div>
+                    <div class="year">
+                        281 Sabi
+                    </div>
+                    <div class="year">
+                        282 Sabi
+                    </div>
+                    <div class="year">
+                        283 Sabi
+                    </div>
+                </div>
+                <div class="event-box">
+                    <div class="event" style="--start: 25; --length: 122;" title="occupation of Besando Rios">Besando Rios</div>
+                    <div class="event" style="--start: 12; --length: 60;" title="occupation of Porto Bosquo">Porto Bosquo</div>
+                    <div class="event" style="--start: 6; --length: 83 ;" title="occupation of Desierto Borde">Desierto Borde</div>
+                    <div class="event" style="--start: 7; --length: 176;" title="occupation of Sangradelta">Sangradelta</div>
+                    <div class="event" style="--start: 27; --length: 2576;" title="war with the Southern Plains">Southern Plains war</div>
+                </div>
+                <div class="event-box">
+                    <div class="event" style="--start: 202; --length: 544;" title="occupation of Cielo Verde">Cielo Verde</div>
+                    <div class="event" style="--start: 10; --length: 355;" title="occupation of Corrianta">Corrianta</div>
+                    <div class="event" style="--start: 7; --length: 152;" title="occupation of Paz Azul">Paz Azul</div>
+                    <div class="event" style="--start: 10; --length: 376;" title="occupation of Montañagua">Montañagua</div>
+                    <div class="event" style="--start: 12; --length: 396;" title="occupation of Cazaltore">Cazaltore</div>
+                    <div class="event" style="--start: 60; --length: 417;" title="occupation of Rios Bosquos">Rios Bosquos</div>
+                </div>
+                <div class="event-box">
+                    <div class="event" style="--start: 756; --length: 1785;" title="war with Rios Montaños">Rios Montaños war</div>
+                </div>
+                <div class="event-box">
+                    <div class="event" style="--start: 2501; --length: 116 ;" title="occupation of Boca Mare">Boca Mare</div>
+                    <div class="event" style="--start: 3; --length: 203;" title="occupation of East Deseaderra">East Deseaderra</div>
+                    <div class="event" style="--start: 4; --length: 312;" title="occupation of Tierrablanca">Tierrablanca</div>
+                </div>
+                <div class="event-box">
+                    <div class="event" style="--start: 2501; --length: 677;" title="war with Pantera Blanca">Pantera Blanca war</div>
+                </div>
+            </div>
+        </div>
         <p>
             Auria started off as a mining city in the mountains (<span class="reference" ref="auria-city">Auria City</span>)
             which focused largely on mining gold, which is where it gets its name (lat. aurum = gold). This lead to the city
