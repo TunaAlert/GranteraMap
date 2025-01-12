@@ -353,7 +353,7 @@ function loop(){
     mapdata.regions.forEach((region)=>{
         region.locations.forEach((location)=>{
             var locationLongLat = pixelCoordsToPolarCoords(location.x, location.y)
-            var distance = greatCircleDistance(mouseLongLat.x, mouseLongLat.y, locationLongLat.x, locationLongLat.y)
+            var distance = greatCircleDistance(mouseLongLat.longitude, mouseLongLat.latitude, locationLongLat.longitude, locationLongLat.latitude)
             if(distance < closestDistance){
                 closestDistance = distance
                 closest = location
